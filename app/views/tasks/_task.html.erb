@@ -1,0 +1,47 @@
+<% current_status = task.status.presence || (task.completed ? "completed" : "pending") %>
+
+<div id="<%= dom_id(task) %>" class="todo-item item-<%= current_status %>" data-status="<%= current_status %>">
+  
+  <% if current_status != "decline" %>
+    <!-- Checkbox ปุ่มเขียวหน้าสุด -->
+    <div class="status-action-wrapper">
+      <% if current_status == "completed" %>
+        <%= button_to task_path(task, task: { status: "pending", completed: false }), method: :patch, class: "btn-check active", title: "ทำเครื่องหมายเป็น Pending" do %>
+          ✓
+        <% end %>
+      <% else %>
+        <%= button_to task_path(task, task: { status: "completed", completed: true }), method: :patch, class: "btn-check", title: "เสร็จสิ้น" do %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <!-- ข้อมูล Task -->
+  <div class="todo-content">
+    <div class="todo-main-line">
+      <span class="status-badge status-<%= current_status %>">
+        <%= current_status.upcase %>
+      </span>
+      <span class="todo-text"><%= task.title %></span>
+    </div>
+    <span class="todo-time">🕒 <%= time_ago_in_words(task.created_at) %> ที่แล้ว</span>
+  </div>
+
+  <!-- ปุ่มจัดการ Action ด้านหลัง -->
+  <div class="actions">
+    <% if current_status == "decline" %>
+      <!-- ปุ่มกู้คืนกลับเป็น Pending -->
+      <%= button_to "↺ กู้คืน", task_path(task, task: { status: "pending", completed: false }), method: :patch, class: "btn-restore", title: "กู้คืนรายการ" %>
+      
+      <!-- ปุ่มลบถาวร -->
+      <%= button_to "ลบถาวร", task_path(task), method: :delete, 
+          form: { data: { turbo_confirm: "คำเตือน: คุณต้องการลบรายการ '#{task.title}' ถาวรหรือไม่?" } }, 
+          class: "btn-permanent-delete", title: "ลบถาวร" %>
+    <% else %>
+      <!-- ปุ่ม Decline (ย้ายไปถังขยะ) -->
+      <%= button_to "✕", task_path(task, task: { status: "decline" }), method: :patch, 
+          class: "btn-action btn-delete", title: "ยกเลิก/ย้ายไป Decline" %>
+    <% end %>
+  </div>
+
+</div>

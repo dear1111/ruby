@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Todo List</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background-color: #f1f5f9;
+      display: flex;
+      justify-content: center;
+      padding: 40px 16px;
+      margin: 0;
+    }
+    .todo-app {
+      background: #ffffff;
+      width: 100%;
+      max-width: 520px;
+      padding: 28px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    }
+    h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      color: #0f172a;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    /* กล่องสรุปจำนวนงาน (Stats Dashboard) */
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+    .stat-card.total { border-color: #cbd5e1; }
+    .stat-card.complete { background: #f0fdf4; border-color: #bbf7d0; }
+    .stat-card.pending { background: #fefce8; border-color: #fef08a; }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .stat-card.total .stat-value { color: #334155; }
+    .stat-card.complete .stat-value { color: #16a34a; }
+    .stat-card.pending .stat-value { color: #ca8a04; }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    /* ฟอร์มเพิ่มงาน */
+    .input-form {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .input-field {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-field:focus {
+      border-color: #2563eb;
+    }
+    .btn-add {
+      background-color: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background-color 0.2s;
+    }
+    .btn-add:hover {
+      background-color: #1d4ed8;
+    }
+
+    /* ปุ่ม Filter */
+    .filter-group {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 18px;
+      justify-content: center;
+    }
+    .filter-btn {
+      background: #f1f5f9;
+      border: 1px solid transparent;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #64748b;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover {
+      background: #e2e8f0;
+    }
+    .filter-btn.active {
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    /* รายการ Task */
+    #tasks {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    /* การจัดวางแต่ละแถวของ Task */
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+/* ปุ่ม Checkbox สีเขียวหน้าสุด */
+.status-action-wrapper form {
+  margin: 0;
+  display: flex;
+}
+.btn-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 2px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+.btn-check:hover {
+  border-color: #16a34a;
+  background-color: #f0fdf4;
+}
+.btn-check.active {
+  background-color: #16a34a;
+  border-color: #16a34a;
+  color: #ffffff;
+}
+
+/* ส่วนแสดงข้อความและเวลา */
+.todo-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.todo-main-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.todo-time {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-left: 2px;
+}
+
+/* ข้อความเมื่อ Complete */
+.item-complete .todo-text {
+  text-decoration: line-through;
+  color: #94a3b8;
+}
+
+/* ปุ่มลบด้านหลัง */
+.actions form {
+  margin: 0;
+}
+.btn-delete {
+  background-color: #fee2e2;
+  color: #ef4444;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+.btn-delete:hover {
+  background-color: #fecaca;
+}
+  </style>
+</head>
+<body>
+
+<div class="todo-app">
+  <h2>Todolist</h2>
+
+  <!-- กล่องสถิติ 4 ช่อง -->
+  <div class="stats-container">
+    <div class="stat-card total">
+      <div class="stat-value"><%= @tasks.where.not(status: 'decline').count %></div>
+      <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-card complete">
+      <div class="stat-value"><%= @tasks.where(status: 'completed').or(@tasks.where(completed: true, status: [nil, 'pending'])).count %></div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card pending">
+      <div class="stat-value"><%= @tasks.where(status: 'pending', completed: [false, nil]).count %></div>
+      <div class="stat-label">Pending</div>
+    </div>
+    <div class="stat-card decline">
+      <div class="stat-value"><%= @tasks.where(status: 'decline').count %></div>
+      <div class="stat-label">Decline</div>
+    </div>
+  </div>
+
+  <!-- ฟอร์มเพิ่มงาน -->
+  <%= form_with(model: @task, html: { class: "input-form" }) do |f| %>
+    <%= f.text_field :title, placeholder: "เพิ่มรายการใหม่...", class: "input-field", required: true %>
+    <%= f.submit "เพิ่มงาน", class: "btn-add" %>
+  <% end %>
+
+  <!-- ปุ่ม Filter -->
+  <div class="filter-group">
+    <button class="filter-btn active" onclick="applyFilter('all', this)">ทั้งหมด</button>
+    <button class="filter-btn" onclick="applyFilter('pending', this)">Pending</button>
+    <button class="filter-btn" onclick="applyFilter('completed', this)">Complete</button>
+    <button class="filter-btn" onclick="applyFilter('decline', this)">Decline</button>
+  </div>
+
+  <!-- รายการ Task -->
+  <div id="tasks">
+    <%= render @tasks %>
+  </div>
+</div>
+
+<script>
+  function applyFilter(filter, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const items = document.querySelectorAll('.todo-item');
+    items.forEach(item => {
+      const status = item.getAttribute('data-status');
+      
+      if (filter === 'all') {
+        // แท็บทั้งหมด จะแสดงเฉพาะ pending กับ completed (ซ่อน decline)
+        item.style.display = (status !== 'decline') ? 'flex' : 'none';
+      } else {
+        // แท็บอื่นๆ แสดงตามสถานะตรงๆ
+        item.style.display = (status === filter) ? 'flex' : 'none';
+      }
+    });
+  }
+
+  // เรียกทำงานค่าเริ่มต้นเมื่อโหลดหน้า
+  document.addEventListener("DOMContentLoaded", () => {
+    const activeBtn = document.querySelector('.filter-btn.active');
+    if (activeBtn) applyFilter('all', activeBtn);
+  });
+</script>
+
+</body>
+</html>

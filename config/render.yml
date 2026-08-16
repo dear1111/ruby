@@ -1,0 +1,14 @@
+services:
+  web:
+    type: web
+    name: workshop-todolist
+    runtime: docker
+    plan: free
+    health_check_path: /up
+    disks:
+      - name: rails-storage
+        mount_path: /rails/storage
+        sizeGB: 1
+    envVars:
+      - key: RAILS_MASTER_KEY
+        sync: false
